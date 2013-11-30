@@ -106,7 +106,7 @@ core::matrix4 CGUIPlot::buildProjectionMatrixOrthoLH( f32 left, f32 right, f32 b
 	//	0            0            1/(zf-zn)   0
 	//	(l+r)/(l-r)  (t+b)/(b-t)  zn/(zn-zf)  1
 
-	M[0] = 2.f/(left-right);
+	M[0] = 2.f/(right-left);
 	M[1] = 0.f;
 	M[2] = 0.f;
 	M[3] = 0.f;
@@ -138,18 +138,17 @@ CGUIPlot::CGUIPlot(
 	s32 id,
 	const core::rect<s32>& rectangle)
 : IGUIElement( EGUIET_ELEMENT, env, parent, id, rectangle)
-//, Viewport(0,0,0,0)
-, ZoomRect(-1,-4,10,5)
-, Plotrect(0,0,0,0)
-, IsDrawBackground(false)
-, BackgroundColor(video::SColor(255,255,255,255))
-, TextColor(video::SColor(255,0,0,0))
-, IsDrawGrid(true)
-, GridColor(video::SColor(255,200,200,200))
-, SubGridColor(video::SColor(255,235,235,235))
 , SceneManager(smgr)
 , Root(0)
 , Camera(0)
+, ZoomRect(-1,-3,10,3)
+, IsDrawBackground(false)
+, BackgroundColor(video::SColor(255,255,255,255))
+, TextColor(video::SColor(255,0,0,0))
+, TextFont(0)
+, IsDrawGrid(true)
+, GridColor(video::SColor(255,200,200,200))
+, SubGridColor(video::SColor(255,235,235,235))
 {
 #ifdef _DEBUG
 	setDebugName("CGUIPlot");
@@ -159,56 +158,55 @@ CGUIPlot::CGUIPlot(
 	setTabStop(false);
 	setTabOrder(-1);
 
-	IGUISkin *skin = 0;
-	if (Environment)
-		skin = Environment->getSkin();
+//	IGUISkin *skin = 0;
+//	if (Environment)
+//		skin = Environment->getSkin();
 
 	//FrameRect.UpperLeftCorner.X += skin->getSize(EGDS_TEXT_DISTANCE_X)+1;
 	//FrameRect.UpperLeftCorner.Y += skin->getSize(EGDS_TEXT_DISTANCE_Y)+1;
 	//FrameRect.LowerRightCorner.X -= skin->getSize(EGDS_TEXT_DISTANCE_X)+1;
 	//FrameRect.LowerRightCorner.Y -= skin->getSize(EGDS_TEXT_DISTANCE_Y)+1;
 
-	// TextColor=skin->getColor(EGDC_HIGH_LIGHT_TEXT);
+	//TextColor=skin->getColor(EGDC_HIGH_LIGHT_TEXT);
+	//TextFont = Environment->getBuiltInFont();
+	TextFont = Environment->getFont("../../media/fonts/courier10.png");
+//	s32 w = rectangle.getWidth(); // in pixels
+//	s32 h = rectangle.getHeight(); // in pixels
+//	s32 sb_size = 16; // in pixels
 
-	s32 w = rectangle.getWidth(); // in pixels
-	s32 h = rectangle.getHeight(); // in pixels
-	s32 sb_size = 16; // in pixels
+//	core::recti r_canvas = makeRect(0,0, (u32)(w-sb_size-1), (u32)(h-sb_size-1) );
+//	core::recti r_scrollH = makeRect(1,h-sb_size, (u32)(w-sb_size-1), (u32)sb_size );
+//	core::recti r_scrollV = makeRect( w-sb_size, 1, (u32)sb_size, (u32)(h-sb_size-1) );
+//	core::recti r_reset = makeRect( w-sb_size, h-sb_size, (u32)sb_size, (u32)sb_size );
 
-	core::recti r_canvas = makeRect(0,0, (u32)(w-sb_size-1), (u32)(h-sb_size-1) );
-	core::recti r_scrollH = makeRect(1,h-sb_size, (u32)(w-sb_size-1), (u32)sb_size );
-	core::recti r_scrollV = makeRect( w-sb_size, 1, (u32)sb_size, (u32)(h-sb_size-1) );
-	core::recti r_reset = makeRect( w-sb_size, h-sb_size, (u32)sb_size, (u32)sb_size );
+//	Plotrect = r_canvas; //! visible ContentRect, Viewport is projected to this rect
 
-	Plotrect = r_canvas; //! visible ContentRect, Viewport is projected to this rect
-
-	ScrollbarH = Environment->addScrollBar(true,r_scrollH,this,-1);
-	ScrollbarH->setVisible(true);
-	ScrollbarH->setSubElement(false);
-	ScrollbarH->setTabStop(false);
-	ScrollbarH->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
-	ScrollbarH->setSmallStep(3);
-	ScrollbarH->setMin(0);
-	ScrollbarH->setMax(100);
-	ScrollbarH->setPos(0);
-
-	ScrollbarV = Environment->addScrollBar(false,r_scrollV,this,-1);
-	ScrollbarV->setVisible(true);
-	ScrollbarV->setSubElement(false);
-	ScrollbarV->setTabStop(false);
-	ScrollbarV->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
-	ScrollbarV->setMin(0);
-	ScrollbarV->setMax(100);
-	ScrollbarV->setSmallStep(3);
-	ScrollbarV->setPos(0);
-
-	Environment->addButton( r_reset, this, -1, L"R", L"Reset Zoom Button");
-
-	BackgroundColor=skin->getColor(EGDC_WINDOW);
-
-	ContentPane = 0;
-
-	Environment->setFocus(this);
+//	ScrollbarH = Environment->addScrollBar(true,r_scrollH,this,-1);
+//	ScrollbarH->setVisible(true);
+//	ScrollbarH->setSubElement(false);
+//	ScrollbarH->setTabStop(false);
+//	ScrollbarH->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
+//	ScrollbarH->setSmallStep(3);
+//	ScrollbarH->setMin(0);
+//	ScrollbarH->setMax(100);
+//	ScrollbarH->setPos(0);
 //
+//	ScrollbarV = Environment->addScrollBar(false,r_scrollV,this,-1);
+//	ScrollbarV->setVisible(true);
+//	ScrollbarV->setSubElement(false);
+//	ScrollbarV->setTabStop(false);
+//	ScrollbarV->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
+//	ScrollbarV->setMin(0);
+//	ScrollbarV->setMax(100);
+//	ScrollbarV->setSmallStep(3);
+//	ScrollbarV->setPos(0);
+//
+//	Environment->addButton( r_reset, this, -1, L"R", L"Reset Zoom Button");
+//
+//	BackgroundColor=skin->getColor(EGDC_WINDOW);
+//
+//	ContentPane = 0;
+
 //	SceneManager = new scene::CSceneManager(
 //		Environment->getVideoDriver(), Environment->getFileSystem(), 0, 0, Environment);
 
@@ -233,24 +231,28 @@ CGUIPlot::CGUIPlot(
 
 	//scene::ISceneManager* SceneManager = SceneManager;
 
-	gui::IGUIFont* font = Environment->getBuiltInFont();
+//	gui::IGUIFont* font = Environment->getBuiltInFont();
 
-	scene::ITextSceneNode* textNode00 = SceneManager->addTextSceneNode(
-		font, L"(0,0)", TextColor, SceneManager->getRootSceneNode(), core::vector3df(0,0,0) );
+//	scene::ITextSceneNode* textNode00 = SceneManager->addTextSceneNode(
+//		font, L"(0,0)", TextColor, SceneManager->getRootSceneNode(), core::vector3df(0,0,0) );
+//
+//	scene::ITextSceneNode* textNodeX = SceneManager->addTextSceneNode(
+//		font, L"X", TextColor, SceneManager->getRootSceneNode(), core::vector3df(ZoomRect.LowerRightCorner.X,0,0) );
+//
+//	scene::ITextSceneNode* textNodeY = SceneManager->addTextSceneNode(
+//		font, L"Y", TextColor, SceneManager->getRootSceneNode(), core::vector3df(0, ZoomRect.UpperLeftCorner.Y,0) );
+//
+//	addShape( textNode00, L"Ursprung" );
+//
+//	addShape( textNodeX, L"X-Axis" );
+//
+//	addShape( textNodeY, L"Y-Axis" );
 
-	scene::ITextSceneNode* textNodeX = SceneManager->addTextSceneNode(
-		font, L"X", TextColor, SceneManager->getRootSceneNode(), core::vector3df(ZoomRect.LowerRightCorner.X,0,0) );
+	addText( "Ursprung", L"(0,0)", core::vector3df(0,0,0), 1,-1, TextColor, TextFont);
+	addText( "X-Axis", L"X", core::vector3df(ZoomRect.LowerRightCorner.X,0,0), 1,-1, TextColor, TextFont);
+	addText( "Y-Axis", L"Y", core::vector3df(0,ZoomRect.LowerRightCorner.Y,0), -1,-1, TextColor, TextFont);
 
-	scene::ITextSceneNode* textNodeY = SceneManager->addTextSceneNode(
-		font, L"Y", TextColor, SceneManager->getRootSceneNode(), core::vector3df(0, ZoomRect.UpperLeftCorner.Y,0) );
-
-	addShape( textNode00, L"Ursprung" );
-
-	addShape( textNodeX, L"X-Axis" );
-
-	addShape( textNodeY, L"Y-Axis" );
-
-
+	Environment->setFocus(this);
 }
 
 
@@ -274,8 +276,7 @@ core::position2di CGUIPlot::projectToScreen( const core::vector3df& pos )
 	return SceneManager->getSceneCollisionManager()->getScreenCoordinatesFrom3DPosition( pos, Camera, true );
 }
 
-//! addShape
-bool CGUIPlot::addShape( scene::ISceneNode* node, const core::stringc& name )
+bool CGUIPlot::addShape( const core::stringc& id, scene::ISceneNode* node)
 {
 	if (!node)
 	{
@@ -287,7 +288,7 @@ bool CGUIPlot::addShape( scene::ISceneNode* node, const core::stringc& name )
 	_IRR_DEBUG_BREAK_IF( !Root )
 
 	Shape shape;
-	shape.Name = name;
+	shape.ID = id;
 	shape.Node = node;
 	Shapes.push_back( shape );
 
@@ -295,9 +296,39 @@ bool CGUIPlot::addShape( scene::ISceneNode* node, const core::stringc& name )
 
 	node->setPosition( core::vector3df(0,0,1000.f - (f32)Shapes.size()) );
 
-	node->setScale( core::vector3df(-1,1,1) ); /// This is a correction to a bug?
+	// node->setScale( core::vector3df(-1,1,1) ); /// This is a correction to a bug?
 
 	printf("CGUIPlot::addShape()::OK\n");
+	return true;
+}
+
+///@brief add 2d text
+bool CGUIPlot::addText(
+	const core::stringc& id,
+	const core::stringw& text,
+	const core::position2di& pos,
+	s32 hAlign,
+	s32 vAlign,
+	const video::SColor& color,
+	gui::IGUIFont* font )
+{
+	SText* _text = new SText( this, id, text, pos, hAlign, vAlign, color, font );
+	Texts.push_back( _text );
+	return true;
+}
+
+///@brief add 3d text
+bool CGUIPlot::addText(
+	const core::stringc& id,
+	const core::stringw& text,
+	const core::vector3df& pos,
+	s32 hAlign,
+	s32 vAlign,
+	const video::SColor& color,
+	gui::IGUIFont* font )
+{
+	SText* _text = new SText( this, id, text, SceneManager, pos, hAlign, vAlign, color, font );
+	Texts.push_back( _text );
 	return true;
 }
 
@@ -319,17 +350,23 @@ void CGUIPlot::draw()
 //	if (!skin)
 //		return;
 
-	video::IVideoDriver* driver = Environment->getVideoDriver();
-	if (!driver)
-		return;
-
 	/// create caption text
-	core::stringw t = L"CGUIPlot | Shape-Count = "; t += Shapes.size();
+	core::stringw t = L"CGUIPlot | Shapes = "; t += Shapes.size();
+	t += L" | Texts = "; t += Texts.size();
+	t += L" | ZoomRect = { ";
+	t += ZoomRect.UpperLeftCorner.X; t += L", ";
+	t += ZoomRect.UpperLeftCorner.Y; t += L", ";
+	t += ZoomRect.LowerRightCorner.X; t += L", ";
+	t += ZoomRect.LowerRightCorner.Y; t += L" }";
 	t += L" | AbsoluteRect = { x="; t += AbsoluteRect.UpperLeftCorner.X;
 	t += L", y="; t += AbsoluteRect.UpperLeftCorner.Y;
 	t += L", w="; t += AbsoluteRect.getWidth();
 	t += L", h="; t += AbsoluteRect.getHeight();
 	t += L"}";
+
+	video::IVideoDriver* driver = Environment->getVideoDriver();
+	if (!driver)
+		return;
 
 	/// deactivate all other SceneNodes than my own Root
 
@@ -343,23 +380,9 @@ void CGUIPlot::draw()
 
 	/// Viewport
 	const core::recti old_Viewport = driver->getViewPort();
-
-	const core::recti new_Viewport( AbsoluteRect.UpperLeftCorner, core::dimension2du( (u32)Plotrect.getWidth(), (u32)Plotrect.getHeight() ) );
-
-	driver->setViewPort( new_Viewport );
-
-	// driver->setTransform( video::ETS_WORLD, core::IdentityMatrix );
-	// driver->setTransform( video::ETS_VIEW, core::IdentityMatrix );
-	// driver->setTransform( video::ETS_PROJECTION, core::IdentityMatrix );
+	driver->setViewPort( AbsoluteRect );
 
 	/// ProjectionMatrix ( Ortho2D )
-	//glMatrixMode( GL_PROJECTION );
-	//glLoadIdentity();
-	//glFrustum( fovy, aspect, znear, zfar );
-	//gluOrtho2D( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top);
-	//gluOrtho2D( ZoomRect.UpperLeftCorner.X, ZoomRect.LowerRightCorner.X,
-	//			ZoomRect.UpperLeftCorner.Y, ZoomRect.LowerRightCorner.Y);
-
 	scene::ICameraSceneNode* old_Camera = SceneManager->getActiveCamera();
 
 	if (Camera)
@@ -377,79 +400,84 @@ void CGUIPlot::draw()
 		SceneManager->setActiveCamera( Camera );
 	}
 
-
-	/// WorldViewMatrix ( World * Camera )
-//	glMatrixMode( GL_MODELVIEW );
-//	glLoadIdentity();
-
-	// set up camera position and orientation
-//	glTranslatef( 0,0,100 );
-
 	SceneManager->drawAll();
 
-//	for (u32 i=0; i<Shapes.size(); i++)
-//	{
-//		scene::ISceneNode* node = Shapes[i].Node;
-//		if (node)
-//		{
-////			glPushMatrix();
-//
-////			const core::matrix4 m = node->getAbsoluteTransformation();
-////			const core::vector3df pos = m.getTranslation();
-////			const core::vector3df rot = m.getRotationDegrees();
-////			const core::vector3df scl = m.getScale();
-//
-////			glTranslatef( pos.X, pos.Y, pos.Z );
-////			glRotatef( 1, 0, 0, rot.X );
-////			glRotatef( 0, 1, 0, rot.Y );
-////			glRotatef( 0, 0, 1, rot.Z );
-////			glScalef( scl.X, scl.Y, scl.Z );
-////
-//			node->render();
-//
-////			glPopMatrix();
-//		}
-//	}
+	/// project vector (0,0,0) for debugging
+//	core::vector3df p3f(0,0,0);
+//	core::position2di p2i = projectToScreen( p3f );
+//	t += L" | project = { ";
+//	t += p2i.X; t += L", ";
+//	t += p2i.Y; t += L"}";
 
+	/// project all 3d texts
+	for (u32 i=0; i<Texts.size(); i++)
+	{
+        SText* _text = Texts[i];
+        if (_text)
+        {
+			if (_text->Is3DText)
+			{
+				_text->ScreenPos = projectToScreen( _text->WorldPos );
+			}
+        }
+	}
+
+	/// restore viewport
+	driver->setViewPort( old_Viewport );
 //	driver->endScene();
 
-	IGUIFont* font = Environment->getBuiltInFont();
-
-	core::vector3df p3f(0,0,0);
-	core::position2di p2i = projectToScreen( p3f );
-	t += L" | project = { ";
-	t += p2i.X; t += L", ";
-	t += p2i.Y; t += L"}";
-
-	core::stringw txt = L"(0,0)";
-	core::dimension2du txt_size = font->getDimension( txt.c_str() );
-
-	driver->setViewPort( old_Viewport );
-
-	font->draw( txt, core::recti(getAbsolutePosition().UpperLeftCorner+p2i, txt_size), TextColor, false, false );
-
-	/// set all SceneNodes visible again
+	/// restore scene
 	showAll( SceneManager );
 
 	if (Root)
 		Root->setVisible( false );
 
-//	if (Camera)
-//		Camera->setVisible( false );
-
 	if (old_Camera)
 		SceneManager->setActiveCamera( old_Camera );
 
+	/// draw all texts of plot
+	for (u32 i=0; i<Texts.size(); i++)
+	{
+        SText* _text = Texts[i];
+        if (_text)
+        {
+			gui::IGUIFont* _font = _text->Font;
+			if (!_font)
+			{
+				_font = TextFont;
+			}
+
+			core::position2di txt_pos = AbsoluteRect.UpperLeftCorner;
+
+			txt_pos += _text->ScreenPos;
+
+			core::dimension2du txt_size = _font->getDimension( _text->Text.c_str() );
+
+			if (_text->HAlign==0)
+			{
+				txt_pos.X -= (s32)(txt_size.Width>>1);
+			}
+			else if (_text->HAlign>0)
+			{
+				txt_pos.X -= (s32)(txt_size.Width);
+			}
+
+			if (_text->VAlign==0)
+			{
+				txt_pos.Y -= (s32)(txt_size.Height>>1);
+			}
+			else if (_text->VAlign>0)
+			{
+				txt_pos.Y -= (s32)(txt_size.Height);
+			}
+
+			if (_font)
+				_font->draw( _text->Text, core::recti( txt_pos, txt_size ), _text->Color, false, false );
+		}
+	}
+
 	/// set Text of Parent ( WindowCaption )
-
-	t += L" | ZoomRect = { ";
-	t += ZoomRect.UpperLeftCorner.X; t += L", ";
-	t += ZoomRect.UpperLeftCorner.Y; t += L", ";
-	t += ZoomRect.LowerRightCorner.X; t += L", ";
-	t += ZoomRect.LowerRightCorner.Y; t += L" }";
 	setText( Parent, t );
-
-
 
 //	if (IsDrawBackground)
 //		driver->draw2DRectangle( BackgroundColor, AbsoluteClippingRect );
@@ -481,9 +509,12 @@ bool CGUIPlot::OnEvent(const SEvent& event)
 {
 	if (IsEnabled)
 	{
-//
-//		switch(event.EventType)
-//		{
+		// OnMouse(event);
+
+		switch(event.EventType)
+		{
+			case EET_MOUSE_INPUT_EVENT: return OnMouse(event); break;
+
 //		case EET_GUI_EVENT:
 //			if (event.GUIEvent.EventType == gui::EGET_MENU_ITEM_SELECTED)
 //			{
@@ -580,14 +611,10 @@ bool CGUIPlot::OnEvent(const SEvent& event)
 //				return true;
 //			break;
 //
-//		case EET_MOUSE_INPUT_EVENT:
-//			if (processMouse(event))
-//				return true;
-//			break;
-//
-//		default:
-//			break;
-//		}
+
+		default:
+			break;
+		}
 	}
 
 	return IGUIElement::OnEvent(event);
@@ -598,54 +625,47 @@ bool CGUIPlot::OnEvent(const SEvent& event)
 
 bool CGUIPlot::OnMouse(const SEvent& event)
 {
-//	s32 value = 0;
-//	switch(event.MouseInput.Event)
-//	{
-//	case EMIE_MOUSE_WHEEL:
-//		value = (s32)-event.MouseInput.Wheel;
-//
-//		if (MultiLine || (WordWrap && BrokenText.size() > 1) )
-//		{
-//
-//			int realVal = value;
-//			if (Scrollbar->getPos()+value < Scrollbar->getMin())
-//				realVal = (Scrollbar->getMin()-Scrollbar->getPos());
-//			if (Scrollbar->getPos()+value > Scrollbar->getMax())
-//				realVal = (Scrollbar->getMax()-Scrollbar->getPos());
-//			Scrollbar->setPos(Scrollbar->getPos() + realVal);
-//			IGUISkin* skin = Environment->getSkin();
-//			IGUIFont* font = OverrideFont ? OverrideFont : skin->getFont();
-//			int height = (s32)font->getDimension(L"O").Height;
-//			VScrollPos=VScrollPos+height*(realVal);
-//			/*s32 lineNo = getLineFromPos(CursorPos);
-//			if (lineNo > 0)
-//			{
-//				s32 cp = CursorPos - BrokenTextPositions[lineNo];
-//
-//				if ((lineNo+value)>=lineCount-1)
-//					value=0;
-//
-//				if ((lineNo+value)<0)
-//					value=0;
-//
-//				if (value!=0)
-//				{
-//					if ((s32)BrokenText[lineNo-1].size() < cp)
-//						CursorPos = BrokenTextPositions[lineNo+value] + (s32)BrokenText[lineNo+value].size()+value;
-//					else
-//						CursorPos = BrokenTextPositions[lineNo+value] + cp;
-//				}
-//			}
-//			if (value!=0)
-//				// Update the scrollbar
-//				//Scrollbar->setPos(getLineFromPos(CursorPos));
-//			calculateScrollPos();*/
-//			return true;
-//
-//		}
-//
-//
-//		break;
+//	if (event.EventType != EET_MOUSE_INPUT_EVENT)
+//		return false;
+
+	const SEvent::SMouseInput& e = event.MouseInput;
+
+	switch(e.Event)
+	{
+		case EMIE_MOUSE_WHEEL:
+		{
+			printf("OnZoomIn()\n");
+
+			const core::position2di mouse_pos(e.X, e.Y);
+
+			core::line3df ray = SceneManager->getSceneCollisionManager()->getRayFromScreenCoordinates( mouse_pos, Camera );
+
+			gui::IGUIFont* font = Environment->getBuiltInFont();
+
+			core::stringw txt = L"Mouse {";
+			txt += e.X; txt += L", ";
+			txt += e.Y; txt += L" }";
+			txt += L", ";
+
+			txt += "Ray { ";
+			txt += ray.start.X; txt += L", ";
+			txt += ray.start.Y; txt += L", ";
+			txt += ray.start.Z; txt += L", ";
+			txt += ray.end.X; txt += L", ";
+			txt += ray.end.Y; txt += L", ";
+			txt += ray.end.Z; txt += L" }";
+
+			core::dimension2du txt_size = font->getDimension( txt.c_str() );
+
+			core::position2di txt_pos = mouse_pos + core::position2di(5,5);
+
+			printf("%ls\n", txt.c_str() );
+
+			font->draw( txt, core::recti( txt_pos, txt_size ), TextColor, false, false );
+			return true;
+		}
+		break;
+
 //	case EMIE_LMOUSE_LEFT_UP:
 //		if (Environment->hasFocus(this))
 //		{
@@ -863,10 +883,10 @@ bool CGUIPlot::OnMouse(const SEvent& event)
 //			}
 //		}
 //		return true;
-//	default:
-//		break;
-//	}
-//
+	default:
+		break;
+	}
+
 	return false;
 }
 

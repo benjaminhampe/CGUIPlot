@@ -38,31 +38,184 @@ namespace gui
 		///@brief struct Shape ( holds a pointer to SceneNode and a name as UTF-8 string )
 		struct Shape
 		{
+			///@brief unique Identifier
+			core::stringc ID;
+
 			///@brief pointer to ISceneNode
 			scene::ISceneNode* Node;
 
-			///@brief UTF-8 name
-			core::stringc Name;
-
 			///@brief struct constructor
-			Shape() : Node(0), Name("")
+			Shape() : ID(""), Node(0)
 			{
 				// empty
 			}
 
 			///@brief struct constructor
-			Shape( scene::ISceneNode* node, core::stringc name	) : Node(node), Name(name)
+			Shape( const core::stringc& id, scene::ISceneNode* node ) : ID(id), Node(node)
 			{
-				// if (Node) Node->grab();
+				// empty
 			}
 
 			///@brief struct destructor
 			~Shape()
 			{
-				// if (Node) Node->drop();
+				// empty
 			}
 		};
 
+		///@brief struct SText2d ( holds a pointer to SceneNode and a name as UTF-8 string )
+		class SText
+		{
+			public:
+
+			///@brief unique Identifier
+			core::stringc ID;
+
+			///@brief UTF-16 text data
+			core::stringw Text;
+
+			///@brief Parent of this text ( mostly an instance of CGUIPlot to get AbsoluteRect, TextColor )
+			CGUIPlot* Parent;
+
+			///@brief Font of this text
+			gui::IGUIFont* Font;
+
+			///@brief Position of this text in 2D screen-space
+			core::position2di ScreenPos;
+
+			///@brief Size of this text
+			core::dimension2du Size;
+
+			///@brief Color of this text
+			video::SColor Color;
+
+			///@brief Horizontal align of this text ( -1=left, 0=center, 1=right )
+			s32 HAlign;
+
+			///@brief Vertical align of this text ( -1=top, 0=middle, 1=bottom )
+			s32 VAlign;
+
+			///@brief true if the 3d world-position should be projected to screen ( needs SceneManager ),
+			/// false if already 2d text and not using world-space coords ( needs only GUIEnvironment )
+			bool Is3DText;
+
+			///@brief SceneManager/VideoDriver to render this text when its 3d
+			scene::ISceneManager* SceneManager;
+
+			///@brief Position of this text in 3D world-space
+			core::vector3df WorldPos;
+
+			private:
+			///@brief forbidden default constructor
+			SText()
+			{
+				// empty
+			}
+
+			public:
+
+			///@brief construct a 2d text
+			SText( CGUIPlot* parent, const core::stringc& id, const core::stringw& text,
+				const core::position2di& screen_pos, s32 hAlign = -1, s32 vAlign = -1,
+				const video::SColor& color = video::SColor(0,0,0,0), gui::IGUIFont* font = 0 )
+			: ID(id), Text(text), Parent(parent), Font(font), ScreenPos(screen_pos)
+			, Size(0,0), Color(color), HAlign(hAlign), VAlign(vAlign)
+			, Is3DText(false), SceneManager(0), WorldPos(0,0,0)
+			{
+				if (!Font && Parent)
+					Font = Parent->getTextFont();
+
+				if (Font && Text.size()>0)
+					Size = Font->getDimension( Text.c_str() );
+
+				if (Color.getAlpha() == 0)
+					Color = Parent->getTextColor();
+			}
+
+			///@brief construct a 3d text
+			SText( CGUIPlot* parent, const core::stringc& id, const core::stringw& text,
+				scene::ISceneManager* smgr, const core::vector3df& world_pos,	s32 hAlign = -1, s32 vAlign = -1,
+				const video::SColor& color = video::SColor(0,0,0,0), gui::IGUIFont* font = 0 )
+			: ID(id), Text(text), Parent(parent), Font(font), ScreenPos(0,0)
+			, Size(0,0), Color(color), HAlign(hAlign), VAlign(vAlign)
+			, Is3DText(true), SceneManager(smgr), WorldPos(world_pos)
+			{
+				if (!Font && Parent)
+					Font = Parent->getTextFont();
+
+				if (Font && Text.size()>0)
+					Size = Font->getDimension( Text.c_str() );
+
+				if (Color.getAlpha() == 0)
+					Color = Parent->getTextColor();
+			}
+
+			///@brief struct destructor
+			~SText()
+			{
+				// empty
+			}
+
+//			void draw()
+//			{
+//				if (!Parent)
+//					return;
+//
+//				if (!Font)
+//					return;
+//
+//				core::position2di txt_pos = Parent->getAbsolutePosition().UpperLeftCorner;
+//
+//				if (Is3DText)
+//				{
+//					if (!SceneManager)
+//						return;
+//
+//					scene::ICameraSceneNode* _cam = SceneManager->getActiveCamera();
+//
+//					if (!_cam)
+//						return;
+//
+//					txt_pos += SceneManager->getSceneCollisionManager()->getScreenCoordinatesFrom3DPosition( WorldPos, _cam, true);
+//
+//					/// we dont need the following if we have access to plot's AbsoluteRect
+//					/// to know where the start-pos of text drawing will be
+//
+//					// video::IVideoDriver* driver = SceneManager->getVideoDriver();
+//
+//					// const core::recti scrPort = core::recti( core::position2di(0,0), driver->getScreenSize());
+//
+//					// const core::recti viewPort = driver->getViewPort();
+//
+//					// create difference of viewport and full screen rect
+//
+//					return true;
+//				}
+//
+//				core::dimension2du txt_size = Font->getDimension( Text.c_str() );
+//
+//				if (HAlign==0)
+//				{
+//					txt_pos.X -= (s32)(txt_size.Width>>1);
+//				}
+//				else if (HAlign==1)
+//				{
+//					txt_pos.X -= (s32)(txt_size.Width);
+//				}
+//
+//				if (VAlign==0)
+//				{
+//					txt_pos.Y -= (s32)(txt_size.Height>>1);
+//				}
+//				else if (VAlign==1)
+//				{
+//					txt_pos.Y -= (s32)(txt_size.Height);
+//				}
+//
+//				Font->draw( Text, core::recti( txt_pos, txt_size ), Color, false, false );
+//			}
+
+		};
 
 		///@brief class constructor
 		///@param smgr ISceneManager
@@ -91,11 +244,55 @@ namespace gui
 		///@return Position in screen/viewport-space
 		virtual core::position2di projectToScreen( const core::vector3df& pos );
 
-		///@brief add SceneNode to draw to plot
-		///@param node ISceneNode to be added to plot
+		///@brief add SceneNode to plot
+		///@param id Unique identifier of this shape
+		///@param node ISceneNode to be added
+		///@return true on success
+		virtual bool addShape( const core::stringc& id, scene::ISceneNode* node );
+
+		///@brief add 2d text
+		///@param id Unique identifier of this text-shape
 		///@param name Name of the ISceneNode
 		///@return true on success
-		virtual bool addShape( scene::ISceneNode* node, const core::stringc& name = "unnamed" );
+		virtual bool addText(
+			const core::stringc& id,
+			const core::stringw& text,
+			const core::position2di& pos,
+			s32 hAlign = -1,
+			s32 vAlign = -1,
+			const video::SColor& color = video::SColor(0,0,0,0),
+			gui::IGUIFont* font = 0 );
+
+		///@brief add 3d text
+		///@param id Unique identifier of this text-shape
+		///@param name Name of the ISceneNode
+		///@return true on success
+		virtual bool addText(
+			const core::stringc& id,
+			const core::stringw& text,
+			const core::vector3df& pos,
+			s32 hAlign = -1,
+			s32 vAlign = -1,
+			const video::SColor& color = video::SColor(0,0,0,0),
+			gui::IGUIFont* font = 0 );
+
+		///@brief get used GUIEnvironment
+		virtual gui::IGUIEnvironment* getGUIEnvironment( )
+		{
+			return Environment;
+		}
+
+		///@brief get used SceneManager
+		virtual scene::ISceneManager* getSceneManager( )
+		{
+			return SceneManager;
+		}
+
+		///@brief get used Camera
+		virtual scene::ICameraSceneNode* getCameraSceneNode( )
+		{
+			return Camera;
+		}
 
 		///@brief set ZoomRect
 		virtual void setZoomRect( const core::rectf& zoomRect )
@@ -121,6 +318,24 @@ namespace gui
 			BackgroundColor = color;
 		}
 
+		///@brief get ClearColor
+		virtual video::SColor getBackgroundColor() const
+		{
+			return BackgroundColor;
+		}
+
+		///@brief get TextColor
+		virtual video::SColor getTextColor() const
+		{
+			return TextColor;
+		}
+
+		///@brief get TextFont
+		virtual gui::IGUIFont* getTextFont() const
+		{
+			return TextFont;
+		}
+
 		// ///@brief Updates the absolute position, splits text if required
 		// virtual void updateAbsolutePosition();
 
@@ -143,38 +358,39 @@ namespace gui
 
 
 	private:
-		IGUIElement* ContentPane;
-		IGUIScrollBar* ScrollbarV;
-		IGUIScrollBar* ScrollbarH;
-		IGUIButton* ButtonZoomReset;
-		IGUIButton* ButtonZoomWindow;
-		IGUIStaticText* LabelZoomRectXMin;
-		IGUIStaticText* LabelZoomRectYMin;
-		IGUIStaticText* LabelZoomRectXMax;
-		IGUIStaticText* LabelZoomRectYMax;
-		IGUIEditBox* EditZoomRectXMin;
-		IGUIEditBox* EditZoomRectYMin;
-		IGUIEditBox* EditZoomRectXMax;
-		IGUIEditBox* EditZoomRectYMax;
+//		IGUIElement* ContentPane;
+//		IGUIScrollBar* ScrollbarV;
+//		IGUIScrollBar* ScrollbarH;
+//		IGUIButton* ButtonZoomReset;
+//		IGUIButton* ButtonZoomWindow;
+//		IGUIStaticText* LabelZoomRectXMin;
+//		IGUIStaticText* LabelZoomRectYMin;
+//		IGUIStaticText* LabelZoomRectXMax;
+//		IGUIStaticText* LabelZoomRectYMax;
+//		IGUIEditBox* EditZoomRectXMin;
+//		IGUIEditBox* EditZoomRectYMin;
+//		IGUIEditBox* EditZoomRectXMax;
+//		IGUIEditBox* EditZoomRectYMax;
+
+		scene::ISceneManager* SceneManager;
+		scene::ISceneNode* Root;
+		scene::ICameraSceneNode* Camera;
 
 		core::rect<f32> ZoomRect;
-		core::rect<s32> Plotrect;
 
 		///@brief Override color for the interface
 		bool IsDrawBackground;
 		video::SColor BackgroundColor;
 
 		video::SColor TextColor;
+		gui::IGUIFont* TextFont;
 
 		bool IsDrawGrid;
 		video::SColor GridColor;
 		video::SColor SubGridColor;
 
 		core::array<Shape> Shapes;
-
-		scene::ISceneManager* SceneManager;
-		scene::ISceneNode* Root;
-		scene::ICameraSceneNode* Camera;
+		core::array<SText*> Texts;
 	};
 
 

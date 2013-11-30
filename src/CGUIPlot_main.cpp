@@ -18,9 +18,10 @@
 
 #include "CGUIPlot.h"
 
+// Makro: FunctorType "f32 (f32)" this app uses
 #if defined(__GXX_EXPERIMENTAL_CXX0X) || __cplusplus >= 201103L
 	#include <functional>
-	#define Functor_f32_f32(x) std::function<f32 (f32)>((x))
+	#define Functor_f32_f32(x) std::function<f32 (const f32&)>((x))
 #else
 	#include <core/IFunction.h>
 	#define Functor_f32_f32(x) (x)
@@ -123,56 +124,43 @@ s32 main( s32 argc, c8** argv)
 
 	plot->setBackgroundColor( video::SColor(128,255,255,255) );
 
-	/// PolyLine from Sine-function
+
+	scene::ISceneNode* smgrRoot = smgr->getRootSceneNode();
+
+	/// PolyLine
 	{
-		scene::ISceneNode* node = createPolyLine<f32>(
-			smgr, smgr->getRootSceneNode(),
-			Functor_f32_f32(vco_0), -1, 10, 2048,
-			video::SColor(255,255,0,0), 0.75f, 0xfcfc );
+		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_0), -1, 10, 2048, video::SColor(255,255,0,0), 0.75f, 0xfcfc );
 
-		if (node)
-			node->setDebugDataVisible( scene::EDS_BBOX );
+		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
 
-		plot->addShape( node, "VCO_0");
+		plot->addShape( "VCO_0", node );
 	}
 
-	/// PolyLine from Sine-function
+	/// PolyLine
 	{
-		scene::ISceneNode* node = createPolyLine<f32>(
-			smgr, smgr->getRootSceneNode(),
-			Functor_f32_f32(vco_1), 0, 5, 2048,
-			video::SColor(255,255,255,0), 2.5f, 0xcccc );
+		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_1), 0, 5, 2048, video::SColor(255,255,255,0), 1.5f, 0xdddd );
 
-		if (node)
-			node->setDebugDataVisible( scene::EDS_BBOX );
+		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
 
-		plot->addShape( node, "VCO_1");
+		plot->addShape( "VCO_1", node );
 	}
 
-	/// PolyLine from Sine-function
+	/// PolyLine
 	{
-		scene::ISceneNode* node = createPolyLine<f32>(
-			smgr, smgr->getRootSceneNode(),
-			Functor_f32_f32(vco_2), 0, 5, 2048,
-			video::SColor(255,0,0,255), .5f, 0xffff );
+		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_2), 0, 5, 2048, video::SColor(255,0,0,255), .5f, 0xffff );
 
-		if (node)
-			node->setDebugDataVisible( scene::EDS_BBOX );
+		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
 
-		plot->addShape( node, "VCO_2");
+		plot->addShape( "VCO_2", node );
 	}
 
-	/// PolyLine from vco_4
+	/// PolyLine
 	{
-		scene::ISceneNode* node = createPolyLine<f32>(
-			smgr, smgr->getRootSceneNode(),
-			Functor_f32_f32(vco_4), 0, 8, 1024,
-			video::SColor(255,0,192,0), .5f, 0xffff );
+		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_4), 0, 8, 1024, video::SColor(255,0,192,0), .5f, 0xffff );
 
-		if (node)
-			node->setDebugDataVisible( scene::EDS_BBOX );
+		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
 
-		plot->addShape( node, "VCO_4");
+		plot->addShape( "VCO_4", node );
 	}
 
 	/// [main loop]
