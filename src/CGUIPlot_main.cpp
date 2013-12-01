@@ -104,6 +104,8 @@ s32 main( s32 argc, c8** argv)
 	CSineOscillator<f32> vco_1(2, 0, 2);
 	CSineOscillator<f32> vco_2(3, 0, 1);
 
+	CRectangleOscillator<f32> vco_3(1, 0.1f, 0.4f, 2, -1);
+
 	CSawOscillator<f32> vco_4(1, 0, 0.5f, -0.5f);
 	CSawOscillator<f32> vco_5(3, 0.5f, 3, 0);
 
@@ -152,6 +154,15 @@ s32 main( s32 argc, c8** argv)
 		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
 
 		plot->addShape( "VCO_2", node );
+	}
+
+	/// PolyLine
+	{
+		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_3), 2, 8, 2048, video::SColor(255,255,0,255), 1.5f, 0xffff );
+
+		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
+
+		plot->addShape( "VCO_3", node );
 	}
 
 	/// PolyLine

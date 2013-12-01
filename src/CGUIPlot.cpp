@@ -634,34 +634,22 @@ bool CGUIPlot::OnMouse(const SEvent& event)
 	{
 		case EMIE_MOUSE_WHEEL:
 		{
-			printf("OnZoomIn()\n");
+			// const core::position2di mouse_pos(e.X, e.Y);
 
-			const core::position2di mouse_pos(e.X, e.Y);
-
-			core::line3df ray = SceneManager->getSceneCollisionManager()->getRayFromScreenCoordinates( mouse_pos, Camera );
-
-			gui::IGUIFont* font = Environment->getBuiltInFont();
-
-			core::stringw txt = L"Mouse {";
-			txt += e.X; txt += L", ";
-			txt += e.Y; txt += L" }";
-			txt += L", ";
-
-			txt += "Ray { ";
-			txt += ray.start.X; txt += L", ";
-			txt += ray.start.Y; txt += L", ";
-			txt += ray.start.Z; txt += L", ";
-			txt += ray.end.X; txt += L", ";
-			txt += ray.end.Y; txt += L", ";
-			txt += ray.end.Z; txt += L" }";
-
-			core::dimension2du txt_size = font->getDimension( txt.c_str() );
-
-			core::position2di txt_pos = mouse_pos + core::position2di(5,5);
-
-			printf("%ls\n", txt.c_str() );
-
-			font->draw( txt, core::recti( txt_pos, txt_size ), TextColor, false, false );
+			if (e.Wheel > 0.0f )
+			{
+				ZoomRect.UpperLeftCorner.X *= 0.9f;
+				ZoomRect.UpperLeftCorner.Y *= 0.9f;
+				ZoomRect.LowerRightCorner.X *= 0.9f;
+				ZoomRect.LowerRightCorner.Y *= 0.9f;
+			}
+			else
+			{
+				ZoomRect.UpperLeftCorner.X *= 1.1f;
+				ZoomRect.UpperLeftCorner.Y *= 1.1f;
+				ZoomRect.LowerRightCorner.X *= 1.1f;
+				ZoomRect.LowerRightCorner.Y *= 1.1f;
+			}
 			return true;
 		}
 		break;

@@ -49,7 +49,7 @@
 					<Add directory="../irrlicht-gl/lib/Win32-gcc" />
 				</Linker>
 				<ExtraCommands>
-					<Add before="windres src/resources.rc -O coff -o obj/resources.o" />
+					<Add before="windres src/resources.rc -O coff -o obj/Win32_gcc_Release_shared/resources.o" />
 				</ExtraCommands>
 			</Target>
 			<Target title="Linux_Debug">
@@ -257,10 +257,10 @@
 					<Add library="freetype250" />
 					<Add library="fftw3" />
 					<Add library="bin\win32\Irrlicht.dll" />
-					<Add library="obj\Win32_gcc_Release_shared\resources.o" />
+					<Add library="obj\resources.o" />
 				</Linker>
 				<ExtraCommands>
-					<Add before="windres src/resources.rc -O coff -o obj/Win32_gcc_Release_shared/resources.o" />
+					<Add before="windres src/resources.rc -O coff -o obj/resources.o" />
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
@@ -366,6 +366,10 @@
 			<Add directory="../irrlicht-gl/include" />
 			<Add directory="../libHampe/include" />
 		</Compiler>
+		<Unit filename="../libHampe/include/audio/CADSREnvelope.cpp" />
+		<Unit filename="../libHampe/include/audio/CADSREnvelope.h" />
+		<Unit filename="../libHampe/include/audio/CCombinedOscillator.cpp" />
+		<Unit filename="../libHampe/include/audio/CCombinedOscillator.h" />
 		<Unit filename="../libHampe/include/audio/CRectangleOscillator.cpp" />
 		<Unit filename="../libHampe/include/audio/CRectangleOscillator.h" />
 		<Unit filename="../libHampe/include/audio/CSawOscillator.cpp" />
