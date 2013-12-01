@@ -1,4 +1,4 @@
-CGUIPlot (c) 2012-2013 by BenjaminHampe@gmx.de
+CGUIPlot (c) by BenjaminHampe@gmx.de
 ================================
 
 This project aims to build a plot widget for the irrlicht-engine using freetype2 fonts, 
