@@ -17,6 +17,9 @@ namespace gui
 	class CGUIPlot : public IGUIElement
 	{
 	public:
+		///@brief checks if the given coords are over ( on border or inside ) given rectangle
+		static bool isOver( const core::position2di& pos, const core::recti& target_rect );
+
 		///@brief set Parent Element Text ( i.e. the caption of a parent's window title )
 		static bool setText( gui::IGUIElement* element, const core::stringw& text );
 
@@ -155,66 +158,6 @@ namespace gui
 			{
 				// empty
 			}
-
-//			void draw()
-//			{
-//				if (!Parent)
-//					return;
-//
-//				if (!Font)
-//					return;
-//
-//				core::position2di txt_pos = Parent->getAbsolutePosition().UpperLeftCorner;
-//
-//				if (Is3DText)
-//				{
-//					if (!SceneManager)
-//						return;
-//
-//					scene::ICameraSceneNode* _cam = SceneManager->getActiveCamera();
-//
-//					if (!_cam)
-//						return;
-//
-//					txt_pos += SceneManager->getSceneCollisionManager()->getScreenCoordinatesFrom3DPosition( WorldPos, _cam, true);
-//
-//					/// we dont need the following if we have access to plot's AbsoluteRect
-//					/// to know where the start-pos of text drawing will be
-//
-//					// video::IVideoDriver* driver = SceneManager->getVideoDriver();
-//
-//					// const core::recti scrPort = core::recti( core::position2di(0,0), driver->getScreenSize());
-//
-//					// const core::recti viewPort = driver->getViewPort();
-//
-//					// create difference of viewport and full screen rect
-//
-//					return true;
-//				}
-//
-//				core::dimension2du txt_size = Font->getDimension( Text.c_str() );
-//
-//				if (HAlign==0)
-//				{
-//					txt_pos.X -= (s32)(txt_size.Width>>1);
-//				}
-//				else if (HAlign==1)
-//				{
-//					txt_pos.X -= (s32)(txt_size.Width);
-//				}
-//
-//				if (VAlign==0)
-//				{
-//					txt_pos.Y -= (s32)(txt_size.Height>>1);
-//				}
-//				else if (VAlign==1)
-//				{
-//					txt_pos.Y -= (s32)(txt_size.Height);
-//				}
-//
-//				Font->draw( Text, core::recti( txt_pos, txt_size ), Color, false, false );
-//			}
-
 		};
 
 		///@brief class constructor
@@ -391,6 +334,9 @@ namespace gui
 
 		core::array<Shape> Shapes;
 		core::array<SText*> Texts;
+
+		bool IsMouseOver;
+
 	};
 
 

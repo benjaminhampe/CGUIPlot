@@ -15,6 +15,17 @@ namespace irr
 namespace gui
 {
 
+bool CGUIPlot::isOver( const core::position2di& pos, const core::recti& target_rect )
+{
+	bool result(false);
+	if (pos.X >= target_rect.UpperLeftCorner.X)
+		if (pos.X <= target_rect.LowerRightCorner.X)
+			if (pos.Y >= target_rect.UpperLeftCorner.Y)
+				if (pos.Y <= target_rect.LowerRightCorner.Y)
+					result = true;
+	return result;
+}
+
 //! set Parent Element Text ( i.e. the caption of a parent's window title )
 bool CGUIPlot::setText( gui::IGUIElement* element, const core::stringw& text )
 {
@@ -149,6 +160,7 @@ CGUIPlot::CGUIPlot(
 , IsDrawGrid(true)
 , GridColor(video::SColor(255,200,200,200))
 , SubGridColor(video::SColor(255,235,235,235))
+, IsMouseOver(false)
 {
 #ifdef _DEBUG
 	setDebugName("CGUIPlot");
@@ -499,7 +511,10 @@ void CGUIPlot::draw()
 //
 //	}
 
-
+	if (IsMouseOver)
+	{
+		driver->draw2DRectangleOutline( AbsoluteRect, video::SColor(255,255,0,0) );
+	}
 	// draw children
 	IGUIElement::draw();
 }
@@ -513,107 +528,116 @@ bool CGUIPlot::OnEvent(const SEvent& event)
 
 		switch(event.EventType)
 		{
-			case EET_MOUSE_INPUT_EVENT: return OnMouse(event); break;
+			case EET_MOUSE_INPUT_EVENT:
+			{
+				//	if (event.EventType != EET_MOUSE_INPUT_EVENT)
+				//		return false;
 
-//		case EET_GUI_EVENT:
-//			if (event.GUIEvent.EventType == gui::EGET_MENU_ITEM_SELECTED)
-//			{
-//				int sel = static_cast<IGUIContextMenu*>(event.GUIEvent.Caller)->getSelectedItem();
-//
-//				if (sel == CM_CUT)
-//					cut();
-//				else if (sel == CM_COPY)
-//					copy();
-//				else if (sel == CM_PASTE)
-//					paste();
-//				else if (sel == CM_DELETE)
-//					deleteText();
-//				else if (sel == CM_UNDO)
-//					undo();
-//				else if (sel == CM_REDO)
-//					redo();
-//
-//
-//				Environment->setFocus(this);
-//				InMenu = false;
-//			}
-//			if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUS_LOST)
-//			{
-//				if (event.GUIEvent.Caller == this)
-//				{
-//					MouseMarking = false;
-//					OldMarkBegin = MarkBegin;
-//					OldMarkEnd = MarkEnd;
-//					//setTextMarkers(0,0);
-//					Environment->setFocus(this);
-//				}
-//				break;
-//			}
-//			if (event.GUIEvent.EventType == EGET_EDITBOX_ENTER)
-//			{
-//				if (event.GUIEvent.Caller == this)
-//				{
-//
-//				}
-//				break;
-//			}
-//
-//			if (event.GUIEvent.EventType == EGET_SCROLL_BAR_CHANGED)
-//			{
-//
-//				if (event.GUIEvent.Caller == Scrollbar)
-//				{
-//					if (MultiLine || (WordWrap && BrokenText.size() > 1) )
-//					{
-//						IGUISkin* skin = Environment->getSkin();
-//						IGUIFont* font = OverrideFont;
-//						if (!OverrideFont)
-//							font = skin->getFont();
-//						s32 scrollMove = font->getDimension(L"O").Height;
-//						VScrollPos = (s32)Scrollbar->getPos()*scrollMove;
-//
-//
-//					}
-//				}
-//				break;
-//			}
-//
-//			if (event.GUIEvent.EventType == EGET_BUTTON_CLICKED)
-//			{
-//				if (event.GUIEvent.Caller == LineToggle)
-//				{
-//					if (LineNumbering)
-//					{
-//						LineNumbering=false;
-//						breakText();
-//						LeftSpace=0;
-//						core::rect<s32> myRect(s32 x, s32 y, s32 w, s32 h);
-//						core::rect<s32> localClipRect = this->myRect(FrameRect.UpperLeftCorner.X+LeftSpace,FrameRect.UpperLeftCorner.Y,FrameRect.getWidth()-(LeftSpace/2),FrameRect.getHeight());
-//						localClipRect.clipAgainst(AbsoluteClippingRect);
-//					}
-//
-//					else
-//					{
-//						LineNumbering=true;
-//						breakText();
-//						LeftSpace=60;
-//						core::rect<s32> myRect(s32 x, s32 y, s32 w, s32 h);
-//						core::rect<s32> localClipRect = this->myRect(FrameRect.UpperLeftCorner.X+LeftSpace,FrameRect.UpperLeftCorner.Y,FrameRect.getWidth()-(LeftSpace/2),FrameRect.getHeight());
-//						localClipRect.clipAgainst(AbsoluteClippingRect);
-//					}
-//				}
-//
-//			}
-//			break;
-//
-//		case EET_KEY_INPUT_EVENT:
-//			if (processKey(event))
-//				return true;
-//			break;
-//
+				const SEvent::SMouseInput& e = event.MouseInput;
 
-		default:
+				const core::position2di mouse_pos(e.X,e.Y);
+
+				switch(e.Event)
+				{
+					/// MouseMove
+					case EMIE_MOUSE_MOVED:
+					{
+						IsMouseOver = isOver( mouse_pos, AbsoluteRect );
+					}
+					break;
+
+					/// MouseWheel
+					case EMIE_MOUSE_WHEEL:
+					{
+						// const core::position2di mouse_pos(e.X, e.Y);
+
+						if (e.Wheel > 0.0f )
+						{
+							ZoomRect.UpperLeftCorner.X *= 0.9f;
+							ZoomRect.UpperLeftCorner.Y *= 0.9f;
+							ZoomRect.LowerRightCorner.X *= 0.9f;
+							ZoomRect.LowerRightCorner.Y *= 0.9f;
+						}
+						else
+						{
+							ZoomRect.UpperLeftCorner.X *= 1.1f;
+							ZoomRect.UpperLeftCorner.Y *= 1.1f;
+							ZoomRect.LowerRightCorner.X *= 1.1f;
+							ZoomRect.LowerRightCorner.Y *= 1.1f;
+						}
+						return true;
+					}
+					break;
+
+					//	case EMIE_LMOUSE_LEFT_UP:
+					//		if (Environment->hasFocus(this))
+					//		{
+					//			if (!InMenu) {
+					//				if (!DoubleClicked) {
+					//					CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
+					//					if (MouseMarking)
+					//					{
+					//						setTextMarkers( MarkBegin, CursorPos );
+					//					}
+					//
+					//					//Scrollbar->setPos(getLineFromPos(CursorPos));
+					//					calculateScrollPos();
+					//
+					//				}
+					//				MouseMarking = false;
+					//				DoubleClicked = false;
+					//			}
+					//			return true;
+					//		}
+					//		break;
+
+
+					//	case EMIE_RMOUSE_LEFT_UP:
+					//		{
+					//			if (Environment->hasFocus(this))
+					//			{
+					//			}
+					//			return true;
+					//			break;
+					//		}
+					//	case EMIE_LMOUSE_DOUBLE_CLICK:
+					//		{
+					//			return true;
+					//			break;
+					//		}
+					//	case EMIE_LMOUSE_TRIPLE_CLICK:
+					//		{
+					//			break;
+					//		}
+					//	case EMIE_LMOUSE_PRESSED_DOWN:
+					//		{
+					//			if (!Environment->hasFocus(this))
+					//			{
+					//				return true;
+					//			}
+					//		}
+					//		return true;
+					//	case EMIE_RMOUSE_PRESSED_DOWN:
+					//		{
+					//			if (!Environment->hasFocus(this))
+					//			{
+					//			}
+					//		}
+					//		return true;
+					default:
+						break;
+				}
+			}
 			break;
+			//
+			//		case EET_KEY_INPUT_EVENT:
+			//			if (processKey(event))
+			//				return true;
+			//			break;
+			//
+
+			default:
+				break;
 		}
 	}
 
@@ -625,255 +649,6 @@ bool CGUIPlot::OnEvent(const SEvent& event)
 
 bool CGUIPlot::OnMouse(const SEvent& event)
 {
-//	if (event.EventType != EET_MOUSE_INPUT_EVENT)
-//		return false;
-
-	const SEvent::SMouseInput& e = event.MouseInput;
-
-	switch(e.Event)
-	{
-		case EMIE_MOUSE_WHEEL:
-		{
-			// const core::position2di mouse_pos(e.X, e.Y);
-
-			if (e.Wheel > 0.0f )
-			{
-				ZoomRect.UpperLeftCorner.X *= 0.9f;
-				ZoomRect.UpperLeftCorner.Y *= 0.9f;
-				ZoomRect.LowerRightCorner.X *= 0.9f;
-				ZoomRect.LowerRightCorner.Y *= 0.9f;
-			}
-			else
-			{
-				ZoomRect.UpperLeftCorner.X *= 1.1f;
-				ZoomRect.UpperLeftCorner.Y *= 1.1f;
-				ZoomRect.LowerRightCorner.X *= 1.1f;
-				ZoomRect.LowerRightCorner.Y *= 1.1f;
-			}
-			return true;
-		}
-		break;
-
-//	case EMIE_LMOUSE_LEFT_UP:
-//		if (Environment->hasFocus(this))
-//		{
-//			if (!InMenu) {
-//				if (!DoubleClicked) {
-//					CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-//					if (MouseMarking)
-//					{
-//						setTextMarkers( MarkBegin, CursorPos );
-//					}
-//
-//					//Scrollbar->setPos(getLineFromPos(CursorPos));
-//					calculateScrollPos();
-//
-//				}
-//				MouseMarking = false;
-//				DoubleClicked = false;
-//			}
-//			return true;
-//		}
-//		break;
-//	case EMIE_MOUSE_MOVED:
-//		{
-//			if (MouseMarking)
-//			{
-//				CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-//				setTextMarkers( MarkBegin, CursorPos );
-//				//TODO: calculateScrollPos seem to have bugs
-//				if (MarkBegin!=CursorPos)
-//					calculateScrollPos();
-//				/*IGUISkin* skin = Environment->getSkin();
-//				IGUIFont* font = OverrideFont ? OverrideFont : skin->getFont();
-//				int height = (s32)font->getDimension(L"O").Height;
-//				s32 lineCount = isMultiLineEnabled() ? BrokenText.size() : 1;
-//				float linesOnScreen = FrameRect.getHeight()/(float)height;
-//				Scrollbar->setPos(std::max(0,getLineFromPos(CursorPos-linesOnScreen)));*/
-//				return true;
-//			}
-//		}
-//		break;
-//	case EMIE_RMOUSE_LEFT_UP:
-//		{
-//			if (!InMenu) {
-//				if (Environment->hasFocus(this))
-//				{
-//					if (!DoubleClicked) {
-//						CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-//						if (MouseMarking)
-//						{
-//							setTextMarkers( MarkBegin, CursorPos );
-//						}
-//
-//						//Scrollbar->setPos(getLineFromPos(CursorPos));
-//						calculateScrollPos();
-//
-//					}
-//					MouseMarking = false;
-//					DoubleClicked = false;
-//				}
-//			}
-//			// Let's create a context menu if right mouse was clicked
-//			core::recti rect(event.MouseInput.X,event.MouseInput.Y,event.MouseInput.X+1,event.MouseInput.Y);
-//			rect.UpperLeftCorner -= AbsoluteRect.UpperLeftCorner;
-//			rect.LowerRightCorner -= AbsoluteRect.UpperLeftCorner;
-//			menu = Environment->addContextMenu(rect,this);
-//			OldMarkBegin = MarkBegin;
-//			OldMarkEnd = MarkEnd;
-//
-//			menu->addItem(menustring[CM_CUT].c_str());
-//			menu->addItem(menustring[CM_COPY].c_str());
-//			menu->addItem(menustring[CM_PASTE].c_str());
-//			menu->addItem(menustring[CM_DELETE].c_str());
-//			menu->addSeparator();
-//			menu->addItem(menustring[CM_UNDO].c_str());
-//			menu->addItem(menustring[CM_REDO].c_str());
-//
-//			InMenu = true;
-//			return true;
-//			break;
-//		}
-//	case EMIE_LMOUSE_DOUBLE_CLICK:
-//		{
-//			// Select the entire word
-//			// Words are only alpha numerical characters, so something like != would not be selected in its entirety (Maybe add an option for the user to say what limits the word?)
-//			CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-//
-//			// Now let's process the word
-//			// First, find the beginning
-//			int start, end;
-//			start = end = 0;
-//
-//			for (int i = CursorPos; i > 0; i--) {
-//				char character;
-//				wcstombs(&character,&Text.c_str()[i],1);
-//				if (!isalnum(character)) {
-//
-//					start = i+1;
-//					break;
-//				}
-//			}
-//			for (u32 i = CursorPos; i < Text.size(); i++) {
-//				char character;
-//				wcstombs(&character,&Text.c_str()[i],1);
-//				if (!isalnum(character)) {
-//
-//					end = i;
-//					break;
-//				}
-//				if (i == Text.size()-1)
-//					end = i+1;
-//			}
-//			setTextMarkers(start,end);
-//			DoubleClicked = true;
-//			return true;
-//			break;
-//		}
-//	case EMIE_LMOUSE_TRIPLE_CLICK:
-//		{
-//			// Select the entire line
-//			// Go from \n to \n
-//			CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-//
-//			// Now let's process the word
-//			// First, find the beginning
-//			int start, end;
-//			start = end = 0;
-//
-//			for (int i = CursorPos; i > 0; i--) {
-//				if (Text.c_str()[i] == L'\n' || Text.c_str()[i] == L'\r') {
-//					start = i+1;
-//					break;
-//				}
-//			}
-//			for (u32 i = CursorPos; i < Text.size(); i++) {
-//				if (Text.c_str()[i] == L'\n' || Text.c_str()[i] == L'\r') {
-//					end = i;
-//					break;
-//				}
-//				if (i == Text.size()-1)
-//					end = i+1;
-//			}
-//			setTextMarkers(start,end);
-//			DoubleClicked = true;
-//			return true;
-//			break;
-//		}
-//	case EMIE_LMOUSE_PRESSED_DOWN:
-//		if (!InMenu) {
-//			if (!Environment->hasFocus(this))
-//			{
-//				BlinkStartTime = IRRdevice->getTimer()->getRealTime();
-//				MouseMarking = true;
-//				CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-//				setTextMarkers(CursorPos, CursorPos );
-//				calculateScrollPos();
-//				return true;
-//			}
-//			else
-//			{
-//				if (!AbsoluteClippingRect.isPointInside(
-//					core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y)))
-//				{
-//					return false;
-//				}
-//				else
-//				{
-//					// move cursor
-//					CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-//
-//					s32 newMarkBegin = MarkBegin;
-//					if (!MouseMarking)
-//						newMarkBegin = CursorPos;
-//
-//					MouseMarking = true;
-//					setTextMarkers( newMarkBegin, CursorPos);
-//					calculateScrollPos();
-//
-//				}
-//			}
-//		}
-//
-//		return true;
-//	case EMIE_RMOUSE_PRESSED_DOWN:
-//		if (!InMenu && !isPointInSelection(core::position2di(event.MouseInput.X,event.MouseInput.Y))) {
-//			if (!Environment->hasFocus(this))
-//			{
-//				BlinkStartTime = IRRdevice->getTimer()->getRealTime();
-//				MouseMarking = true;
-//				CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-//				setTextMarkers(CursorPos, CursorPos );
-//				calculateScrollPos();
-//				return true;
-//			}
-//			else
-//			{
-//				if (!AbsoluteClippingRect.isPointInside(
-//					core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y)))
-//				{
-//					return false;
-//				}
-//				else
-//				{
-//					// move cursor
-//					CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-//
-//					s32 newMarkBegin = MarkBegin;
-//					if (!MouseMarking)
-//						newMarkBegin = CursorPos;
-//
-//					MouseMarking = true;
-//					setTextMarkers( newMarkBegin, CursorPos);
-//					calculateScrollPos();
-//
-//				}
-//			}
-//		}
-//		return true;
-	default:
-		break;
-	}
 
 	return false;
 }
