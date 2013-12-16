@@ -59,9 +59,10 @@ CGUIPlotManager::CGUIPlotManager(
 	s32 w = AbsoluteRect.getWidth(); // in pixels
 	s32 h = AbsoluteRect.getHeight(); // in pixels
 
-	s32 bar_height = 120;
-	s32 tab_height = 32;
-	s32 btn_height = 24;
+	s32 bar_height = 88;
+	s32 tab_height = 24;
+	s32 btn_width = 64;
+	s32 btn_height = 32;
 
 	TabControl = Environment->addTabControl( core::recti( 0, 0, w, bar_height), this, true, true, -1 );
 	TabControl->setTabHeight( tab_height );
@@ -75,11 +76,19 @@ CGUIPlotManager::CGUIPlotManager(
 	gui::IGUITab* TabHelp = TabControl->addTab(L"Help", -1);
 
 	s32 x = 0;
+	s32 y = 0;
+	Environment->addButton( core::recti(x,y,x+btn_width-1, y+btn_height-1), TabStart, -1, L"New", L"New"); x+=btn_width;
+	Environment->addButton( core::recti(x,y,x+btn_width-1, y+btn_height-1), TabStart, -1, L"Load", L"Load"); x+=btn_width;
+	Environment->addButton( core::recti(x,y,x+btn_width-1, y+btn_height-1), TabStart, -1, L"Save", L"Save"); x+=btn_width;
+	Environment->addButton( core::recti(x,y,x+btn_width-1, y+btn_height-1), TabStart, -1, L"SaveAs", L"SaveAs"); x+=btn_width;
+	y+=btn_height;
 
-	Environment->addButton( core::recti(x,0,x+btn_height-1, btn_height-1), TabStart, -1, L"New", L"New"); x+=btn_height;
-	Environment->addButton( core::recti(x,0,x+btn_height-1, btn_height-1), TabStart, -1, L"Load", L"Load"); x+=btn_height;
-	Environment->addButton( core::recti(x,0,x+btn_height-1, btn_height-1), TabStart, -1, L"Save", L"Save"); x+=btn_height;
-	Environment->addButton( core::recti(x,0,x+btn_height-1, btn_height-1), TabStart, -1, L"SaveAs", L"SaveAs"); x+=btn_height;
+	x=0;
+	Environment->addButton( core::recti(x,y,x+btn_width-1, y+btn_height-1), TabStart, -1, L"New", L"New"); x+=btn_width;
+	Environment->addButton( core::recti(x,y,x+btn_width-1, y+btn_height-1), TabStart, -1, L"Load", L"Load"); x+=btn_width;
+	Environment->addButton( core::recti(x,y,x+btn_width-1, y+btn_height-1), TabStart, -1, L"Save", L"Save"); x+=btn_width;
+	Environment->addButton( core::recti(x,y,x+btn_width-1, y+btn_height-1), TabStart, -1, L"SaveAs", L"SaveAs"); x+=btn_width;
+	y+=btn_height;
 
 	Environment->setFocus(this);
 }

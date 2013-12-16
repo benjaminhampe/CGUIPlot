@@ -143,41 +143,41 @@ s32 main( s32 argc, c8** argv)
 		plot->addShape( "VCO_0", node );
 	}
 
-//	/// PolyLine
-//	{
-//		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_1), 0, 5, 2048, video::SColor(255,255,255,0), 1.5f, 0xdddd );
-//
-//		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
-//
-//		plot->addShape( "VCO_1", node );
-//	}
-//
-//	/// PolyLine
-//	{
-//		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_2), 0, 5, 2048, video::SColor(255,0,0,255), .5f, 0xffff );
-//
-//		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
-//
-//		plot->addShape( "VCO_2", node );
-//	}
-//
-//	/// PolyLine
-//	{
-//		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_3), 2, 8, 2048, video::SColor(255,255,0,255), 1.5f, 0xffff );
-//
-//		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
-//
-//		plot->addShape( "VCO_3", node );
-//	}
-//
-//	/// PolyLine
-//	{
-//		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_4), 0, 8, 1024, video::SColor(255,0,192,0), .5f, 0xffff );
-//
-//		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
-//
-//		plot->addShape( "VCO_4", node );
-//	}
+	/// PolyLine
+	{
+		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_1), 0, 5, 2048, video::SColor(255,255,255,0), 1.5f, 0xdddd );
+
+		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
+
+		plot->addShape( "VCO_1", node );
+	}
+
+	/// PolyLine
+	{
+		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_2), 0, 5, 2048, video::SColor(255,0,0,255), .5f, 0xffff );
+
+		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
+
+		plot->addShape( "VCO_2", node );
+	}
+
+	/// PolyLine
+	{
+		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_3), 2, 8, 2048, video::SColor(255,255,0,255), 1.5f, 0xffff );
+
+		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
+
+		plot->addShape( "VCO_3", node );
+	}
+
+	/// PolyLine
+	{
+		scene::ISceneNode* node = createPolyLine<f32>( smgr, smgrRoot, Functor_f32_f32(vco_4), 0, 8, 1024, video::SColor(255,0,192,0), .5f, 0xffff );
+
+		if (node) node->setDebugDataVisible( scene::EDS_BBOX );
+
+		plot->addShape( "VCO_4", node );
+	}
 
 	/// PolyLine [ADSR-curve]
 	{
