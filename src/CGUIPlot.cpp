@@ -300,8 +300,7 @@ bool CGUIPlot::addShape( const core::stringc& id, scene::ISceneNode* node)
 	_IRR_DEBUG_BREAK_IF( !Root )
 
 	Shape shape;
-	shape.ID = id;
-	shape.Node = node;
+	shape.setSceneNode(node);
 	Shapes.push_back( shape );
 
 	node->setParent( Root );

@@ -459,8 +459,13 @@
 		<Unit filename="../libHampe/include/video/renderByPrimitiveType.h" />
 		<Unit filename="../libHampe/include/video/renderToImage.cpp" />
 		<Unit filename="../libHampe/include/video/renderToImage.h" />
+		<Unit filename="README.md" />
+		<Unit filename="src/CGUIClassBuilder.cpp" />
+		<Unit filename="src/CGUIClassBuilder.h" />
 		<Unit filename="src/CGUIPlot.cpp" />
 		<Unit filename="src/CGUIPlot.h" />
+		<Unit filename="src/CGUIPlotManager.cpp" />
+		<Unit filename="src/CGUIPlotManager.h" />
 		<Unit filename="src/CGUIPlot_main.cpp" />
 		<Unit filename="src/MyEventReceiver.cpp" />
 		<Unit filename="src/MyEventReceiver.h" />

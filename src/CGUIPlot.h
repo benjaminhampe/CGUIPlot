@@ -13,6 +13,7 @@ namespace irr
 {
 namespace gui
 {
+
 	///@brief class CGUIPlot
 	class CGUIPlot : public IGUIElement
 	{
@@ -39,22 +40,20 @@ namespace gui
 		}
 
 		///@brief struct Shape ( holds a pointer to SceneNode and a name as UTF-8 string )
-		struct Shape
+		class Shape : public IReferenceCounted
 		{
 			///@brief unique Identifier
-			core::stringc ID;
+			u32 ID;
 
 			///@brief pointer to ISceneNode
 			scene::ISceneNode* Node;
 
-			///@brief struct constructor
-			Shape() : ID(""), Node(0)
-			{
-				// empty
-			}
+			public:
 
 			///@brief struct constructor
-			Shape( const core::stringc& id, scene::ISceneNode* node ) : ID(id), Node(node)
+			explicit Shape( scene::ISceneNode* node = 0 )
+				: ID(getReferenceCount())
+				, Node(node)
 			{
 				// empty
 			}
@@ -63,6 +62,31 @@ namespace gui
 			~Shape()
 			{
 				// empty
+			}
+
+			virtual u32 getID() const
+			{
+				return this->ID;
+			}
+
+			virtual scene::ISceneNode* getSceneNode()
+			{
+				return this->Node;
+			}
+
+			virtual void setSceneNode( scene::ISceneNode* node , bool grabIt = false )
+			{
+				if (Node && grabIt)
+				{
+					Node->drop();
+				}
+
+				Node = node;
+
+				if (Node && grabIt)
+				{
+					Node->grab();
+				}
 			}
 		};
 
@@ -340,6 +364,38 @@ namespace gui
 	};
 
 
+	// Makro: FunctorType "f32 (f32)" this app uses
+	#define CLASS_ADD_ATTRIBUTE(attrib_name, visiblity, ret_type, ...) \
+		virtual ret_type set attrib_name ( const video::SColor& color ) \
+		{\
+			 = color;\
+		}\
+		\
+		\
+		virtual video::SColor getBackgroundColor() const \
+		{ \
+			return BackgroundColor; \
+		} \
+
+	//__LINE__
+	//die Zeilennummer der aktuellen Zeile in der Programmdatei
+	//__FILE__
+	//der Name der Programmdatei
+	//__DATE__
+	//das Übersetzungsdatum der Programmdatei
+	//__TIME__
+	//die Übersetzungszeit der Programmdatei
+	//__STDC__
+	//das Erkennungsmerkmal eines ANSI-C-Compilers. Ist die ganzzahlige Konstante auf den Wert 1 gesetzt, handelt es sich um einen ANSI-C-konformen Compiler.
+	//__cplusplus
+	//C++-Code
+
+	///@brief class CGUIPlot
+	class CGUIPlotMgrToolBar : public IGUIElement
+	{
+	public:
+
+	};
 } // end namespace gui
 } // end namespace irr
 

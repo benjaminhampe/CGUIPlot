@@ -17,6 +17,8 @@
 #include "MyEventReceiver.h"
 
 #include "CGUIPlot.h"
+#include "CGUIPlotManager.h"
+#include "CGUIClassBuilder.h"
 
 // Makro: FunctorType "f32 (f32)" this app uses
 #if defined(__GXX_EXPERIMENTAL_CXX0X) || __cplusplus >= 201103L
@@ -26,8 +28,6 @@
 	#include <core/IFunction.h>
 	#define Functor_f32_f32(x) (x)
 #endif
-
-
 
 using namespace irr;
 using namespace scene::geometry;
@@ -119,7 +119,9 @@ s32 main( s32 argc, c8** argv)
 
 	/// create CGUIPlot
 
-	gui::CGUIPlot* plot = new gui::CGUIPlot( smgr, env, plotWindow, -1, plotWindow->getClientRect() );
+	gui::CGUIPlotManager* plotMgr = new gui::CGUIPlotManager( env, plotWindow, -1, plotWindow->getClientRect());
+
+	gui::CGUIPlot* plot = plotMgr->addPlot( new gui::CGUIPlot( smgr, env, plotMgr, -1, plotMgr->getClientRect() ) );
 
 	// left, bottom, right, top
 	plot->setZoomRect( core::rectf( -1,-3,10,3) );
@@ -127,6 +129,7 @@ s32 main( s32 argc, c8** argv)
 	plot->setDrawBackground( true );
 
 	plot->setBackgroundColor( video::SColor(128,255,255,255) );
+
 
 
 	scene::ISceneNode* smgrRoot = smgr->getRootSceneNode();
